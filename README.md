@@ -1,5 +1,5 @@
 # FP30_LCD
-Software for Raspberry Pi to Control Roland FP-30 Midi Keyboard using LCD Screen & Rotary RGB Encoder - written in Python.
+Software for Raspberry Pi to Control Roland FP-30 Midi Keyboard using LCD Screen & Rotary RGB Encoder.
 
 Objectives: 
 1) Display & Select available instruments, Change Volume, BPM
