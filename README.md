@@ -16,9 +16,10 @@ Hardware used:
 
 Usefull Links:
 - ROTARY ENCODER
-  - https://qbalsdon.github.io/circuitpython/rotary-encoder/python/led/2021/02/27/rgb-rotary-encoder.html
+  - https://qbalsdon.github.io/circuitpython/rotary-encoder/python/led/2021/02/27/rgb-rotary-encoder.html - From Quintin Balsdon
   - https://www.sparkfun.com/products/15141
   - https://github.com/sparkfun/Rotary_Encoder_Breakout-Illuminated/blob/main/Firmware/RGB_Rotary_Encoder/RGB_Rotary_Encoder.ino
+  - https://www.smbaker.com/rgb-rotary-encoder-on-a-raspberry-pi - Work from Dr. Scott M. Baker
   
 - RASPBERRY PI GPIOs
   - https://raspberry-projects.com/pi/pi-hardware/raspberry-pi-model-b/model-b-io-pins
