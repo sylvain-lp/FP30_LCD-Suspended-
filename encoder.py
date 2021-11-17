@@ -2,29 +2,37 @@
 # you can configure a callback which will be called whenever the value changes.
 
 import RPi.GPIO as GPIO
-from time import sleep
+from time import sleep, time
 
 BLUE_LED_PIN = 22 # ( 15 Physical Pin / 22 BCM Pin)
+SWITCH_PIN   = 10 # ( 19 Physical Pin / 10 BCM Pin)
 
+BTN_PUSHED   = 100
+BTN_RELEASED = 101
 
 class Encoder:
 
-    def __init__(self, leftPin, rightPin, callback=None):
+    def __init__(self, leftPin, rightPin, buttonPin, callback=None):
         self.leftPin = leftPin
         self.rightPin = rightPin
+        self.buttonPin = buttonPin
         self.value = 0
         self.state = '00'
         self.direction = None
         self.callback = callback
+        self.stop = 0 # for Button press timer
         # SLP: Added to make sure using the right GPIO PIN (BCM/Broadcom)
         GPIO.setmode(GPIO.BCM)
         # GPIO.setup(self.leftPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         # GPIO.setup(self.rightPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
         # SLP: Replace PUD_DOWN with PUD_UP since my ROTARY ENCODER expects UP
-        GPIO.setup(self.leftPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(self.rightPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(self.leftPin, GPIO.BOTH, callback=self.transitionOccurred)  
-        GPIO.add_event_detect(self.rightPin, GPIO.BOTH, callback=self.transitionOccurred)  
+        GPIO.setup(self.leftPin,   GPIO.IN, pull_up_down=GPIO.PUD_UP)   # Rotary A
+        GPIO.setup(self.rightPin,  GPIO.IN, pull_up_down=GPIO.PUD_UP)   # Rotary B
+        GPIO.setup(self.buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # Push Button
+
+        GPIO.add_event_detect(self.leftPin,   GPIO.BOTH, callback=self.transitionOccurred)  
+        GPIO.add_event_detect(self.rightPin,  GPIO.BOTH, callback=self.transitionOccurred)  
+        GPIO.add_event_detect(self.buttonPin, GPIO.RISING, callback=self.button_event, bouncetime=200)
 
         # SLP: Initialize BLUE LED (off)
         GPIO.setup(BLUE_LED_PIN, GPIO.OUT, initial=GPIO.LOW)   # Set LED pin 22 to be an output pin and set initial value to low (off)
@@ -41,6 +49,29 @@ class Encoder:
             # print("Blue LED ON")
             # leep(1) # Pause 1 sec for Testing
         self.active = active
+
+    # Button Events - PUSHED & RELEASED
+    def button_event(self,buttonPin):
+        # buttonState = GPIO.input(buttonPin) 
+        #if buttonState == 1:
+            # event = BTN_RELEASED # self.BUTTONUP
+        # else:
+        #    print("BUTTON is RELEASED:", buttonState)
+        start = time() #start timer
+        print("last:", self.stop, "now:", start, "delta:", start - self.stop)
+
+        if (start - self.stop) < 0.24:
+            print("SKIPPING Bounce call - delta: ", start - self.stop )
+            return
+        else:
+            sleep(0.20)
+            while(GPIO.input(buttonPin) == 1): #always loop if button pressed
+                sleep(0.04)
+            self.stop = time() #stop timer
+            print("BUTTON is RELEASED after %.2f ms" % (self.stop - start))
+            sleep(0.20)
+        # length = time() - start #get long time button pressed
+        return
 
     def transitionOccurred(self, channel):
         p1 = GPIO.input(self.rightPin)
