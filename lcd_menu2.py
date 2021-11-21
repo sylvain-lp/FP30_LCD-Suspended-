@@ -7,7 +7,8 @@ from datetime import datetime
 import time
 import RPi.GPIO as GPIO
 from encoder import Encoder
-from FP30_Instruments import instruments, FP30_Instruments
+#from FP30_Instruments import instruments, FP30_Instruments
+from FP90_INST import instruments, FP90_Instruments
 
 class LCDMenu:
 # Initialize object & LCD
@@ -104,14 +105,14 @@ def valueChanged(value): # Rotary Button  Moved
 		menu.display_string_pos("-- TOP MENU --", 1, 1)
 
 #GPIO.setmode(GPIO.BOARD)   # Initialize Encode, Using physical pin numbering
-enc1 = Encoder(11,9, valueChanged)	# BCM Pin 11 & 9 = Physical Pin 23 & 21 (Rpi B.Rev 2)
+enc1 = Encoder(11,9,10, valueChanged)	# BCM Rotary Pin 11 & 9 = Physical Pin 23 & 21 (Rpi B.Rev 2). PUSH BTN Pin 10 (Physical 19)
 # enc1.led_blue(True)	    # Turn Encoder BLUE (Blue LED ON)
 # enc1.led_blue(True)	    # Turn Encoder BLUE (Blue LED ON)
 # enc1.led_blue(True)	    # Turn Encoder BLUE (Blue LED ON)
 
 try:
 	# sleep(5)
-	instr = FP30_Instruments(instruments)
+	instr = FP90_Instruments(instruments)
 	print("DEBUG", instr.get_item(1))
 	menu = LCDMenu(instr.get_item(1)) # Create LCD / Menu instance
 	#	mylcd.backlight(1)
@@ -127,6 +128,8 @@ try:
 
 # Clear Screen + Turn Backlight OFF + Rotary LED OFF
 except KeyboardInterrupt:	# Ctrl-C to terminate the program
+	enc1.led_red(False)		# Turn Encoder LED OFF (Red LED OFF)
+	enc1.led_green(False)	# Turn Encoder LED OFF (Green LED OFF)
 	enc1.led_blue(False)	# Turn Encoder LED OFF (Blue LED OFF)
 	menu.lcd.lcd_clear()	# Clean characters from LCD
 	GPIO.cleanup()			# Clean Encoder

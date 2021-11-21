@@ -4,7 +4,10 @@
 import RPi.GPIO as GPIO
 from time import sleep, time
 
-BLUE_LED_PIN = 22 # ( 15 Physical Pin / 22 BCM Pin)
+RED_LED_PIN   = 22 # ( 15 Physical Pin / 22 BCM Pin)
+GREEN_LED_PIN = 27 # ( 13 Physical Pin / 27 BCM Pin)
+BLUE_LED_PIN  = 17 # ( 11 Physical Pin / 17 BCM Pin)
+
 SWITCH_PIN   = 10 # ( 19 Physical Pin / 10 BCM Pin)
 
 BTN_PUSHED   = 100
@@ -23,53 +26,83 @@ class Encoder:
         self.stop = 0 # for Button press timer
         # SLP: Added to make sure using the right GPIO PIN (BCM/Broadcom)
         GPIO.setmode(GPIO.BCM)
-        # GPIO.setup(self.leftPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        # GPIO.setup(self.rightPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
-        # SLP: Replace PUD_DOWN with PUD_UP since my ROTARY ENCODER expects UP
+
+        # Initializing Rotary Encoder Directions Pins A, B & PUSH BUTTON
+        # SLP: Replaced PUD_DOWN with PUD_UP for A & B since my ROTARY ENCODER expects UP
         GPIO.setup(self.leftPin,   GPIO.IN, pull_up_down=GPIO.PUD_UP)   # Rotary A
         GPIO.setup(self.rightPin,  GPIO.IN, pull_up_down=GPIO.PUD_UP)   # Rotary B
         GPIO.setup(self.buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # Push Button
 
+       # SLP: Initialize RGB LEDs - turn BLUE (R & G are left OFF)
+        GPIO.setup(RED_LED_PIN,   GPIO.OUT, initial=GPIO.HIGH)   # Set LED pins to be Output pins and initial value: high (off)
+        GPIO.setup(GREEN_LED_PIN, GPIO.OUT, initial=GPIO.HIGH)   # Set LED pins to be Output pins and initial value: high (off)
+        GPIO.setup(BLUE_LED_PIN,  GPIO.OUT, initial=GPIO.LOW)    # Set LED pins to be Output pins and initial value: LOW (ON)
+
+        # Initializin Interrupts for Rotary Directions Pins A, B & PUSH BUTTON
         GPIO.add_event_detect(self.leftPin,   GPIO.BOTH, callback=self.transitionOccurred)  
         GPIO.add_event_detect(self.rightPin,  GPIO.BOTH, callback=self.transitionOccurred)  
         GPIO.add_event_detect(self.buttonPin, GPIO.RISING, callback=self.button_event, bouncetime=200)
 
-        # SLP: Initialize BLUE LED (off)
-        GPIO.setup(BLUE_LED_PIN, GPIO.OUT, initial=GPIO.LOW)   # Set LED pin 22 to be an output pin and set initial value to low (off)
-
+ 
         # SLP: Added LED Actions
+    def led_red(self, active = False):
+        if active == False:
+            GPIO.output(RED_LED_PIN, GPIO.HIGH) # Turn RED LED OFF
+        else:
+            GPIO.output(RED_LED_PIN, GPIO.LOW) # Turn RED LED ON
+            self.active = True
+
+    def led_green(self, active = False):
+        if active == False:
+            GPIO.output(GREEN_LED_PIN, GPIO.HIGH) # Turn GREEN LED OFF
+        else:
+            GPIO.output(GREEN_LED_PIN, GPIO.LOW) # Turn GREEN LED ON
+            self.active = True
+
     def led_blue(self, active = False):
-        print ("DEBUG: led ACTIVE attribute is : ",active)
         if active == False:
             GPIO.output(BLUE_LED_PIN, GPIO.HIGH) # Turn BLUE LED OFF
-            # print("Blue LED OFF")
-            # sleep(1) # Pause 1 sec for Testing
         else:
             GPIO.output(BLUE_LED_PIN, GPIO.LOW) # Turn BLUE LED ON
-            # print("Blue LED ON")
-            # leep(1) # Pause 1 sec for Testing
-        self.active = active
+            self.active = True
 
-    # Button Events - PUSHED & RELEASED
+    # Button Events - PUSHED & RELEASED + DEBOUNCE using TIMER
     def button_event(self,buttonPin):
         # buttonState = GPIO.input(buttonPin) 
         #if buttonState == 1:
             # event = BTN_RELEASED # self.BUTTONUP
         # else:
         #    print("BUTTON is RELEASED:", buttonState)
+       
         start = time() #start timer
-        print("last:", self.stop, "now:", start, "delta:", start - self.stop)
+        # print("last:", self.stop, "now:", start, "delta:", start - self.stop)
 
+        # If BOUNCE CALL, then RETURN
         if (start - self.stop) < 0.24:
             print("SKIPPING Bounce call - delta: ", start - self.stop )
             return
         else:
+            # BUTTON starts as SHORT PUSH - TURNED GREEN
+            self.led_blue(False) # Turn off BLUE Light
+            self.led_green(True) # BUTTON is GREEN when SHORT PUSH
             sleep(0.20)
-            while(GPIO.input(buttonPin) == 1): #always loop if button pressed
+            while((GPIO.input(buttonPin) == 1) and (time() - start < 1)): #always loop if button pressed
                 sleep(0.04)
-            self.stop = time() #stop timer
-            print("BUTTON is RELEASED after %.2f ms" % (self.stop - start))
-            sleep(0.20)
+                self.stop = time() #stop timer
+            # AFTER SHORT PRESS, TURN BUTTON back to BLUE
+            self.led_green(False) 
+            if (time() - start) < 1:
+                self.led_blue(True)
+                print("SHORT PRESS: %.2f ms" % (time() - start))
+            # AFTER LONG PRESS, TURN BUTTON to RED
+            else:
+                self.led_red(True)
+                print("LONG PRESS: %.2f ms" % (time() - start))
+                sleep(2)
+                self.led_red(False)
+                self.led_blue(True)
+
+            # sleep(0.20)
         # length = time() - start #get long time button pressed
         return
 
