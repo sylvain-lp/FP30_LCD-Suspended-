@@ -54,7 +54,7 @@ class Encoder:
         if active == False:
             GPIO.output(self.RED_LED_PIN, GPIO.HIGH) # Turn RED LED OFF
         else:
-            GPIO.output(Rself.ED_LED_PIN, GPIO.LOW) # Turn RED LED ON
+            GPIO.output(self.RED_LED_PIN, GPIO.LOW) # Turn RED LED ON
             self.active = True
 
     def led_green(self, active = False):
