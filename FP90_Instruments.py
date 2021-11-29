@@ -1,28 +1,31 @@
 #!/usr/bin/python
 
 """ 
-Raspberry Pi Rev. 2 Model B PINS
+Raspberry Pi Rev. 2 Model B PINS (26 pins)
 CONNECTING I2C LCD 20x04 and ROTARY ENCODER RGB SWITCH
 
- (LCD Pins) (LED Pins)    (ROTARY Pins) 
-
- +5    GR
- v     ND
- |     |
- 2  4  6  8 10 12 14 16 18 20 22 24 26
- 1  3  5  7  9 11 13 15 17 19 21 23 25
-    |  |     |  |  |     |  |  |  |  |
-    S  S     LD LD LD   +3 GP GP GP GR
-    D  C      B  G  R   v3 10 09 11 ND
-    A  L
+L                1  2 --- +5V
+C       SDA ---  3  4
+D       SCL ---  5  6 --- GND
+                 7  8
+L   BLU LED ---  9 10
+E   GRN LED --- 11 12
+D   RED LED --- 13 14
+                15 16
+R     +3.3V --- 17 18
+O   GPIO 10 --- 19 20
+T   GPIO 09 --- 21 22
+A   GPIO 11 --- 23 24
+R       GND --- 25 26
+Y
 """
 
 instruments={}
 """ INSTRUMENT LABEL, BANK SELECT MSB, LSB, PROGRAM CHANGE """
 instruments={
-    1:["Concert Piano(GP1)",0, 68, 1],
-    2:["Ballad Piano(GP2)",16, 67, 1],
-    3:["Bright Piano(GP3)",8, 66, 2],
+    1:["Concert Piano 1",0, 68, 1],
+    2:["Ballad Piano  2",16, 67, 1],
+    3:["Bright Piano  3",8, 66, 2],
     4:["Mellow Piano",4, 64, 1],
     5:["Upright Piano",16, 64, 1],
     6:["Mellow Upright",1, 65, 1],
@@ -379,6 +382,10 @@ instruments={
     357:["Explosion",121, 3, 128]
 }
 
+# Left Justify all Instruments & Pad with Spaces (to the right) for LCD display
+#for i in range(0, len(instruments)):
+ #   instruments[i]
+
 # print(instruments["21"][0], instruments["21"][2])
 
 class FP90_Instruments:
@@ -396,14 +403,17 @@ class FP90_Instruments:
             # print(i, self.label, self.bank_msb,self.bank_lsb,self.program_change) #self.menu_items[i][0])
             # print(self.get_item(i))
             print("%2d %s" % (i,self.menu_items[i][0])) # label)
-            # vars(i)
+            # vars(i) 
 
     def get_item(self, i):
-        return("%2d %s" % (i,self.menu_items[i][0]))
+        # return("%2d %s" % (i,self.menu_items[i][0]))
+        # Truncate Instrument Name to 17 chars & Pad with 'spaces' for LCD screen size
+        return("%2d %s" % (i,self.menu_items[i][0].ljust(17)  ))
         # return("%02d %-15s %3d %3d %3d" % (i, self.menu_items[i][0], self.menu_items[i][1],self.menu_items[i][2],self.menu_items[i][3]))
 
     @property
     def selected_item(self):
+        #return self._selected_item.ljust(17)
         return self._selected_item
 
     @selected_item.setter
@@ -430,9 +440,3 @@ class FP90_Instruments:
 
 # lcdmenu = LCDMenu(instruments)
 # lcdmenu.list_items()
-
-
-    
-
-
-
