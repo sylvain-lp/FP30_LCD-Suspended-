@@ -16,10 +16,11 @@ Software for Raspberry Pi to Control Roland FP-30 Midi Keyboard using LCD Screen
 ### Software required:
 - Python3
 - Mido
-- RTMidi
+- RTMidi (ie. _not python-rtmidi_)
 
-`pip3 install mido`
-`pip3 install python-rtmidi`
+- `pip3 install mido`
+
+- `pip3 install rtmidi`
 
 ### Usefull Links:
 #### - ROTARY ENCODER
