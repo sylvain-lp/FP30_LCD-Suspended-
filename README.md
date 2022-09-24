@@ -1,3 +1,11 @@
+### WARNING ###
+# This project is suspended, as of Sep. 2022 
+# It is not in a working status as published today 
+# Only Display / Menu is Working, not successful controling Roland Piano yet
+# Suspending the project to attempt the same on Raspberry Pico with TFT LCD instead
+# Will come back if succesful - For now, having difficulties with USB Host on Pico
+### Be back soon
+
 # FP30_LCD
 Software for Raspberry Pi to Control Roland FP-30 Midi Keyboard using LCD Screen & Rotary RGB Encoder.
 
@@ -29,7 +37,7 @@ Software for Raspberry Pi to Control Roland FP-30 Midi Keyboard using LCD Screen
   - https://github.com/sparkfun/Rotary_Encoder_Breakout-Illuminated/blob/main/Firmware/RGB_Rotary_Encoder/RGB_Rotary_Encoder.ino
   - https://www.smbaker.com/rgb-rotary-encoder-on-a-raspberry-pi - Work from Dr. Scott M. Baker
   
-#### - RASPBERRY PI GPIOs
+#### - RASPBERRY PI GPIOs - Model B Revision B
   - https://raspberry-projects.com/pi/pi-hardware/raspberry-pi-model-b/model-b-io-pins
   
 #### - ROLAND CORP. MIDI IMPLEMENTATION Reference
